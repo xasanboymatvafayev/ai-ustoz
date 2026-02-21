@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Ustoz — O'quvchi</title>
+<script src="config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0d0f14;--surface:#13151c;--card:#1a1d27;
+  --card2:#1e2130;--border:#252836;--border2:#2f3347;
+  --accent:#4f8ef7;--accent2:#7c5af7;--green:#22d3a0;
+  --red:#f75a5a;--orange:#f59e0b;--text:#e8eaf2;--muted:#6b7280;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--text);min-height:100vh;}
+
+/* HEADER */
+header{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.logo-sm{display:flex;align-items:center;gap:8px;}
+.logo-icon-sm{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-size:0.9rem;
+}
+.logo-text-sm{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.name-pill{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:6px 12px;
+  font-size:0.8rem;color:var(--muted);
+}
+.btn-logout{
+  background:none;border:1px solid var(--border);
+  border-radius:8px;padding:6px 10px;
+  color:var(--muted);font-size:0.78rem;cursor:pointer;
+  transition:all 0.15s;font-family:'DM Sans',sans-serif;
+}
+.btn-logout:hover{border-color:var(--red);color:var(--red);}
+
+/* LAYOUT */
+.container{max-width:720px;margin:0 auto;padding:24px 16px;}
+
+/* VIEWS */
+.view{display:none;}
+.view.active{display:block;}
+
+/* PANEL */
+.panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:20px;margin-bottom:16px;
+}
+.panel h3{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;margin-bottom:14px;}
+
+/* JOIN GROUP */
+.join-row{display:flex;gap:8px;}
+.inp{
+  flex:1;background:var(--card2);border:1px solid var(--border2);
+  border-radius:8px;padding:10px 14px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;
+  outline:none;width:100%;transition:border-color 0.15s;
+}
+.inp:focus{border-color:var(--accent);}
+.inp::placeholder{color:var(--muted);}
+.inp.mono{font-family:'Syne',sans-serif;letter-spacing:3px;text-transform:uppercase;text-align:center;}
+
+.btn{
+  padding:10px 18px;border-radius:8px;border:none;
+  font-family:'DM Sans',sans-serif;font-weight:600;font-size:0.875rem;
+  cursor:pointer;transition:all 0.15s;white-space:nowrap;
+}
+.btn-accent{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.btn-accent:hover{opacity:0.9;}
+.btn-ghost{background:var(--card2);border:1px solid var(--border2);color:var(--muted);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-full{width:100%;padding:13px;}
+
+.msg{font-size:0.82rem;margin-top:8px;padding:8px 12px;border-radius:7px;display:none;}
+.msg.ok{background:rgba(34,211,160,0.08);border:1px solid rgba(34,211,160,0.2);color:var(--green);}
+.msg.err{background:rgba(247,90,90,0.08);border:1px solid rgba(247,90,90,0.2);color:var(--red);}
+
+/* GROUP CARDS */
+.group-list{display:flex;flex-direction:column;gap:8px;}
+.group-item{
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:10px;padding:14px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;transition:all 0.15s;
+}
+.group-item:hover{border-color:var(--border2);background:rgba(79,142,247,0.04);}
+.group-name{font-family:'Syne',sans-serif;font-weight:700;}
+.group-sub{font-size:0.75rem;color:var(--muted);}
+.arr{color:var(--muted);font-size:1.1rem;}
+
+/* BACK BUTTON */
+.back-btn{
+  display:flex;align-items:center;gap:6px;
+  background:none;border:none;color:var(--accent);
+  font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;
+  cursor:pointer;margin-bottom:16px;padding:0;
+  transition:opacity 0.15s;
+}
+.back-btn:hover{opacity:0.7;}
+
+/* ASSIGNMENT CARDS */
+.assign-card{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:12px;padding:16px 18px;
+  cursor:pointer;transition:all 0.15s;margin-bottom:10px;
+}
+.assign-card:hover{border-color:var(--border2);}
+.assign-card.active-task{border-color:rgba(79,142,247,0.4);background:rgba(79,142,247,0.04);}
+.assign-card.done{opacity:0.6;}
+.assign-card.expired{opacity:0.5;cursor:default;}
+.assign-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;}
+.assign-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;}
+.assign-desc{font-size:0.82rem;color:var(--muted);line-height:1.55;}
+.assign-foot{display:flex;align-items:center;gap:8px;margin-top:10px;}
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:6px;font-size:0.73rem;font-weight:600;
+}
+.badge-blue{background:rgba(79,142,247,0.1);border:1px solid rgba(79,142,247,0.2);color:var(--accent);}
+.badge-green{background:rgba(34,211,160,0.1);border:1px solid rgba(34,211,160,0.2);color:var(--green);}
+.badge-red{background:rgba(247,90,90,0.1);border:1px solid rgba(247,90,90,0.2);color:var(--red);}
+.badge-orange{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);color:var(--orange);}
+.badge-gray{background:rgba(107,114,128,0.1);border:1px solid rgba(107,114,128,0.2);color:var(--muted);}
+
+/* SUBMIT VIEW */
+.timer-ring{
+  display:flex;flex-direction:column;align-items:center;
+  background:linear-gradient(135deg,rgba(245,158,11,0.06),rgba(239,68,68,0.04));
+  border:1px solid rgba(245,158,11,0.25);
+  border-radius:14px;padding:20px;margin-bottom:16px;
+}
+.timer-ring-label{font-size:0.78rem;color:var(--orange);font-weight:600;margin-bottom:4px;}
+#timer-big{
+  font-family:'Syne',sans-serif;font-size:3.5rem;font-weight:800;
+  color:var(--red);font-variant-numeric:tabular-nums;
+  line-height:1;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+.blink{animation:blink 1s infinite;}
+.timer-sub{font-size:0.75rem;color:var(--muted);margin-top:6px;}
+
+.task-box{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;margin-bottom:16px;
+}
+.task-box-head{padding:16px 20px;border-bottom:1px solid var(--border);}
+.task-box-body{padding:16px 20px;}
+.task-box h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;margin-bottom:4px;}
+.task-desc{font-size:0.85rem;color:var(--muted);line-height:1.6;}
+
+.textarea-wrap{position:relative;}
+textarea.inp{
+  resize:vertical;min-height:180px;line-height:1.6;
+  flex:unset;width:100%;
+}
+.word-count{
+  position:absolute;bottom:10px;right:12px;
+  font-size:0.72rem;color:var(--muted);pointer-events:none;
+}
+
+/* AI RESULT */
+.ai-result{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;margin-top:16px;overflow:hidden;
+}
+.ai-result-head{
+  background:linear-gradient(135deg,rgba(79,142,247,0.08),rgba(124,90,247,0.05));
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.ai-score-display{
+  display:flex;align-items:baseline;gap:6px;
+}
+.ai-score-num{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;color:var(--accent);}
+.ai-score-denom{font-size:1rem;color:var(--muted);}
+.ai-stars{font-size:1.1rem;margin-left:4px;}
+.ai-conf{font-size:0.75rem;color:var(--muted);}
+.ai-result-body{padding:16px 20px;}
+.ai-comment-text{
+  font-size:0.83rem;color:var(--muted);
+  white-space:pre-line;line-height:1.7;
+}
+.final-score-box{
+  margin-top:14px;padding:14px;
+  background:rgba(34,211,160,0.06);border:1px solid rgba(34,211,160,0.2);
+  border-radius:10px;display:flex;align-items:center;justify-content:space-between;
+}
+.final-score-box strong{font-family:'Syne',sans-serif;font-size:1.1rem;color:var(--green);}
+
+/* SUBMITTED BANNER */
+.submitted-banner{
+  background:rgba(34,211,160,0.06);border:1px solid rgba(34,211,160,0.2);
+  border-radius:10px;padding:14px 16px;
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:14px;
+}
+.submitted-banner .icon{font-size:1.4rem;}
+.submitted-banner strong{font-size:0.9rem;color:var(--green);}
+.submitted-banner span{font-size:0.78rem;color:var(--muted);}
+
+/* LATE BANNER */
+.late-banner{
+  background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);
+  border-radius:10px;padding:12px 16px;
+  font-size:0.82rem;color:var(--orange);
+  margin-bottom:14px;
+}
+
+/* NOTIFY */
+.notify{
+  position:fixed;top:70px;right:16px;z-index:200;
+  background:var(--card2);border:1px solid var(--border);
+  border-left:3px solid var(--accent);
+  border-radius:10px;padding:12px 16px;max-width:300px;
+  transform:translateX(320px);transition:transform 0.3s;
+}
+.notify.show{transform:translateX(0);}
+.notify .n-title{font-size:0.8rem;font-weight:600;color:var(--text);margin-bottom:2px;}
+.notify .n-body{font-size:0.75rem;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-sm">
+    <div class="logo-icon-sm">🎓</div>
+    <span class="logo-text-sm">AI Ustoz</span>
+  </div>
+  <div class="header-right">
+    <div class="name-pill">👨‍🎓 <span id="h-name">O'quvchi</span></div>
+    <button class="btn-logout" onclick="logout()">Chiqish</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== HOME VIEW ===== -->
+  <div class="view active" id="v-home">
+    <!-- Join group -->
+    <div class="panel">
+      <h3>🔗 Guruhga qo'shilish</h3>
+      <div class="join-row">
+        <input id="j-key" class="inp mono" placeholder="AB12CD34" maxlength="8">
+        <button class="btn btn-accent" onclick="joinGroup()">Qo'shilish</button>
+      </div>
+      <div id="j-msg" class="msg"></div>
+      <p style="font-size:0.75rem;color:var(--muted);margin-top:8px;">O'qituvchingizdan 8 xonali invite key so'rang</p>
+    </div>
+
+    <!-- My groups -->
+    <div class="panel">
+      <h3>📚 Guruhlarim</h3>
+      <div class="group-list" id="group-list">
+        <div style="text-align:center;padding:30px;color:var(--muted);">Yuklanmoqda...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ASSIGNMENTS VIEW ===== -->
+  <div class="view" id="v-assignments">
+    <button class="back-btn" onclick="showView('home')">← Guruhlar</button>
+    <div class="panel" style="margin-bottom:16px;">
+      <h3 id="v-group-name">Guruh vazifalari</h3>
+    </div>
+    <div id="assign-list"></div>
+  </div>
+
+  <!-- ===== SUBMIT VIEW ===== -->
+  <div class="view" id="v-submit">
+    <button class="back-btn" onclick="showView('assignments')">← Vazifalar</button>
+
+    <!-- Timer -->
+    <div id="timer-box" style="display:none">
+      <div class="timer-ring">
+        <div class="timer-ring-label">⏱ Qolgan vaqt</div>
+        <div id="timer-big" class="blink">--:--</div>
+        <div class="timer-sub">Vaqt tugashidan oldin yuboring!</div>
+      </div>
+    </div>
+
+    <!-- Task -->
+    <div class="task-box">
+      <div class="task-box-head">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span id="s-badge" class="badge badge-blue">Aktiv</span>
+        </div>
+        <h2 id="s-title"></h2>
+      </div>
+      <div class="task-box-body">
+        <p class="task-desc" id="s-desc"></p>
+      </div>
+    </div>
+
+    <!-- Already submitted -->
+    <div id="sub-banner" style="display:none">
+      <div class="submitted-banner">
+        <span class="icon">✅</span>
+        <div>
+          <strong>Topshiriq yuborilgan</strong><br>
+          <span id="sub-time">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Late banner -->
+    <div id="late-banner" style="display:none" class="late-banner">
+      ⚠️ Bu topshiriq kech yuborildi (timer tugagandan keyin)
+    </div>
+
+    <!-- Submit form -->
+    <div id="submit-form">
+      <div class="task-box">
+        <div class="task-box-head" style="border-bottom:none;padding-bottom:0;">
+          <h3 style="font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;">✍️ Javobingiz</h3>
+        </div>
+        <div class="task-box-body">
+          <div class="textarea-wrap">
+            <textarea id="answer" class="inp" placeholder="Javobingizni bu yerga yozing..." oninput="updateWc()"></textarea>
+            <span class="word-count" id="wc">0 so'z</span>
+          </div>
+          <button id="submit-btn" class="btn btn-accent btn-full" style="margin-top:12px;" onclick="submitAnswer()">
+            📤 Topshirish
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Result -->
+    <div id="ai-result" style="display:none" class="ai-result">
+      <div class="ai-result-head">
+        <div>
+          <div style="font-size:0.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">🤖 AI Baholash natijasi</div>
+          <div class="ai-score-display">
+            <span class="ai-score-num" id="r-score">—</span>
+            <span class="ai-score-denom">/5</span>
+            <span class="ai-stars" id="r-stars"></span>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="ai-conf">Ishonch darajasi</div>
+          <div style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:var(--text);" id="r-conf">—%</div>
+        </div>
+      </div>
+      <div class="ai-result-body">
+        <p class="ai-comment-text" id="r-comment"></p>
+        <div id="r-final" class="final-score-box" style="display:none">
+          <span style="font-size:0.82rem;color:var(--muted);">O'qituvchi bali:</span>
+          <strong id="r-final-val">—</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- NOTIFY -->
+<div class="notify" id="notify">
+  <div class="n-title" id="n-title"></div>
+  <div class="n-body" id="n-body"></div>
+</div>
+
+<script>
+// API from config.js
+const API = API_BASE + '/api';
+const token = localStorage.getItem('token');
+if (!token || localStorage.getItem('role') !== 'student') window.location.href = '/';
+
+document.getElementById('h-name').textContent = localStorage.getItem('full_name') || 'O\'quvchi';
+
+let currentGroupId = null;
+let currentAssignId = null;
+let timerIv = null;
+let ws = null;
+
+async function req(url, opts = {}) {
+  const r = await fetch(API + url, {
+    headers: {'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', ...opts.headers},
+    ...opts
+  });
+  return {data: await r.json(), ok: r.ok};
+}
+
+// ===== VIEW MANAGEMENT =====
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('v-' + name).classList.add('active');
+  if (name === 'home') loadGroups();
+}
+
+// ===== JOIN GROUP =====
+async function joinGroup() {
+  const key = document.getElementById('j-key').value.trim().toUpperCase();
+  if (key.length < 6) return showMsg('j-msg', '❌ Key kamida 6 belgi', 'err');
+  const {data, ok} = await req('/groups/join', {method:'POST', body: JSON.stringify({invite_key: key})});
+  if (ok) {
+    showMsg('j-msg', '✅ ' + data.message, 'ok');
+    document.getElementById('j-key').value = '';
+    setTimeout(loadGroups, 800);
+  } else {
+    showMsg('j-msg', '❌ ' + (data.detail || 'Noto\'g\'ri key'), 'err');
+  }
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text; el.className = 'msg ' + type; el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+// ===== GROUPS =====
+async function loadGroups() {
+  const {data} = await req('/groups/my');
+  const list = document.getElementById('group-list');
+  if (!Array.isArray(data) || !data.length) {
+    list.innerHTML = `<div style="text-align:center;padding:30px;">
+      <div style="font-size:2rem;margin-bottom:8px;">📚</div>
+      <p style="color:var(--muted);font-size:0.875rem;">Hali guruhga qo'shilmadingiz.<br>Yuqoridagi maydonga invite key kiriting.</p>
+    </div>`;
+    return;
+  }
+  list.innerHTML = data.map(g => `
+    <div class="group-item" onclick="loadAssignments(${g.id}, '${escQ(g.name)}')">
+      <div><div class="group-name">${g.name}</div><div class="group-sub">ID: ${g.id}</div></div>
+      <span class="arr">→</span>
+    </div>
+  `).join('');
+}
+
+// ===== ASSIGNMENTS =====
+async function loadAssignments(groupId, groupName) {
+  currentGroupId = groupId;
+  document.getElementById('v-group-name').textContent = groupName;
+  showView('assignments');
+
+  const {data} = await req(`/assignments/group/${groupId}`);
+  const list = document.getElementById('assign-list');
+
+  if (!Array.isArray(data) || !data.length) {
+    list.innerHTML = `<div class="panel" style="text-align:center;padding:40px;">
+      <div style="font-size:2rem;margin-bottom:8px;">📝</div>
+      <p style="color:var(--muted);">Hali vazifa yo'q</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = data.map(a => {
+    const active = a.is_active;
+    let badgeHtml = active
+      ? `<span class="badge badge-blue">✓ Aktiv</span>`
+      : `<span class="badge badge-gray">⛔ Tugagan</span>`;
+    if (a.is_timer) badgeHtml += `<span class="badge badge-orange">⏱ ${a.timer_minutes} min</span>`;
+
+    return `<div class="assign-card ${active ? 'active-task' : 'expired'}" onclick="${active || !a.is_timer ? `openAssignment(${a.id})` : 'void(0)'}">
+      <div class="assign-head">
+        <span class="assign-title">${a.title}</span>
+      </div>
+      <p class="assign-desc">${a.description.substring(0, 120)}${a.description.length > 120 ? '…' : ''}</p>
+      <div class="assign-foot">
+        ${badgeHtml}
+        <span style="margin-left:auto;font-size:0.72rem;color:var(--muted);">${new Date(a.created_at).toLocaleDateString('uz-UZ')}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  connectWs(groupId);
+}
+
+// ===== OPEN ASSIGNMENT =====
+async function openAssignment(assignId) {
+  currentAssignId = assignId;
+  if (timerIv) clearInterval(timerIv);
+
+  const [{data: a}, {data: mySub}] = await Promise.all([
+    req(`/assignments/${assignId}`),
+    req(`/submissions/my/${assignId}`)
+  ]);
+
+  showView('submit');
+
+  document.getElementById('s-title').textContent = a.title;
+  document.getElementById('s-desc').textContent = a.description;
+
+  // Badge
+  const badge = document.getElementById('s-badge');
+  if (!a.is_active && a.is_timer) {
+    badge.textContent = '⛔ Vaqt tugagan'; badge.className = 'badge badge-red';
+  } else if (a.is_timer) {
+    badge.textContent = `⏱ ${a.timer_minutes} daqiqa`; badge.className = 'badge badge-orange';
+  } else {
+    badge.textContent = '✓ Aktiv'; badge.className = 'badge badge-blue';
+  }
+
+  // Timer
+  const timerBox = document.getElementById('timer-box');
+  if (a.is_timer && a.remaining_seconds > 0) {
+    timerBox.style.display = 'block';
+    startTimer(a.remaining_seconds);
+  } else if (a.is_timer) {
+    timerBox.style.display = 'block';
+    document.getElementById('timer-big').textContent = '00:00';
+    document.getElementById('timer-big').classList.remove('blink');
+  } else {
+    timerBox.style.display = 'none';
+  }
+
+  // Reset
+  document.getElementById('ai-result').style.display = 'none';
+  document.getElementById('sub-banner').style.display = 'none';
+  document.getElementById('late-banner').style.display = 'none';
+  document.getElementById('submit-form').style.display = 'block';
+  document.getElementById('answer').value = '';
+  document.getElementById('wc').textContent = '0 so\'z';
+  resetSubmitBtn();
+
+  // Already submitted?
+  if (mySub.status === 'submitted') {
+    document.getElementById('sub-banner').style.display = 'flex';
+    document.getElementById('sub-time').textContent = 'Yuborildi: ' + (mySub.submitted_at || '');
+    document.getElementById('submit-form').style.display = 'none';
+    if (mySub.is_late) document.getElementById('late-banner').style.display = 'block';
+    if (mySub.ai_score) showAiResult({ai_score: mySub.ai_score, ai_comment: mySub.ai_comment, confidence: 85, is_late: mySub.is_late}, mySub.final_score);
+    return;
+  }
+
+  // Expired and timer?
+  if (a.is_timer && !a.is_active) {
+    blockSubmit();
+  }
+}
+
+function updateWc() {
+  const t = document.getElementById('answer').value.trim();
+  const w = t ? t.split(/\s+/).length : 0;
+  document.getElementById('wc').textContent = `${w} so'z`;
+}
+
+// ===== SUBMIT =====
+async function submitAnswer() {
+  const content = document.getElementById('answer').value.trim();
+  if (!content || content.length < 10) return notify('Javob', 'Kamida 10 belgi kiriting', 'err');
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = '⏳ Tekshirilmoqda...';
+
+  const {data, ok} = await req('/submissions/submit', {
+    method: 'POST', body: JSON.stringify({assignment_id: currentAssignId, content})
+  });
+
+  if (ok) {
+    document.getElementById('submit-form').style.display = 'none';
+    document.getElementById('sub-banner').style.display = 'flex';
+    document.getElementById('sub-time').textContent = 'Hozir yuborildi';
+    if (data.is_late) document.getElementById('late-banner').style.display = 'block';
+    showAiResult(data, null);
+    if (timerIv) clearInterval(timerIv);
+  } else {
+    notify('Xato', data.detail || 'Xato yuz berdi', 'err');
+    btn.disabled = false; btn.textContent = '📤 Topshirish';
+  }
+}
+
+function showAiResult(data, finalScore) {
+  document.getElementById('ai-result').style.display = 'block';
+  document.getElementById('r-score').textContent = data.ai_score;
+  document.getElementById('r-stars').textContent = '⭐'.repeat(Math.round(data.ai_score || 0));
+  document.getElementById('r-conf').textContent = (data.confidence || 80) + '%';
+  document.getElementById('r-comment').textContent = (data.ai_comment || '').replace(/\\n/g, '\n');
+  if (finalScore != null) {
+    document.getElementById('r-final').style.display = 'flex';
+    document.getElementById('r-final-val').textContent = finalScore + '/5';
+  }
+  document.getElementById('ai-result').scrollIntoView({behavior:'smooth'});
+}
+
+// ===== TIMER =====
+function startTimer(seconds) {
+  const el = document.getElementById('timer-big');
+  el.classList.add('blink');
+  let left = seconds;
+  timerIv = setInterval(() => {
+    left--;
+    const m = String(Math.floor(left/60)).padStart(2,'0');
+    const s = String(left%60).padStart(2,'0');
+    el.textContent = `${m}:${s}`;
+    if (left <= 10) el.style.color = 'var(--red)';
+    if (left <= 0) {
+      clearInterval(timerIv);
+      el.classList.remove('blink');
+      el.style.color = 'var(--muted)';
+      blockSubmit();
+    }
+  }, 1000);
+}
+
+function blockSubmit() {
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '⛔ Vaqt tugadi';
+  btn.style.background = 'var(--card2)';
+  btn.style.color = 'var(--muted)';
+  btn.style.cursor = 'not-allowed';
+}
+function resetSubmitBtn() {
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = false; btn.textContent = '📤 Topshirish';
+  btn.style.background = '';btn.style.color = '';btn.style.cursor = '';
+}
+
+// ===== WEBSOCKET =====
+function connectWs(groupId) {
+  if (ws) ws.close();
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  ws = new WebSocket(WS_BASE + '/ws/' + groupId);
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'new_assignment') {
+      notify('📝 Yangi vazifa!', msg.title + (msg.is_timer ? ` · ${msg.timer_minutes} daqiqa` : ''), 'info');
+      if (document.getElementById('v-assignments').classList.contains('active')) {
+        loadAssignments(currentGroupId, document.getElementById('v-group-name').textContent);
+      }
+    }
+  };
+  setInterval(() => { if (ws.readyState === 1) ws.send(JSON.stringify({type:'ping'})); }, 25000);
+}
+
+// ===== NOTIFY =====
+function notify(title, body, type = 'info') {
+  document.getElementById('n-title').textContent = title;
+  document.getElementById('n-body').textContent = body;
+  const el = document.getElementById('notify');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+function escQ(s) { return (s || '').replace(/'/g, "\\'"); }
+function logout() { localStorage.clear(); window.location.href = '/'; }
+
+loadGroups();
+</script>
+</body>
+</html>

@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Ustoz</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #080b12;
+  --surface: #0e1219;
+  --card: #131720;
+  --card2: #181d27;
+  --border: #1e2535;
+  --border2: #252e40;
+  --blue: #3b82f6;
+  --blue2: #6366f1;
+  --teal: #14b8a6;
+  --green: #10b981;
+  --red: #ef4444;
+  --amber: #f59e0b;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --muted2: #475569;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 15%, rgba(59,130,246,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 85% 85%, rgba(20,184,166,0.06) 0%, transparent 55%);
+  pointer-events: none;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* ===== WRAPPER ===== */
+.wrapper {
+  width: 100%; max-width: 420px;
+  position: relative; z-index: 1;
+  animation: up 0.4s ease both;
+}
+@keyframes up { from { opacity:0; transform: translateY(18px); } to { opacity:1; transform:translateY(0); } }
+
+/* ===== HEADER ===== */
+.site-header { text-align: center; margin-bottom: 28px; }
+.logo-row { display: inline-flex; align-items: center; gap: 11px; margin-bottom: 10px; }
+.logo-gem {
+  width: 46px; height: 46px;
+  background: linear-gradient(135deg, var(--blue), var(--teal));
+  border-radius: 13px; display: grid; place-items: center;
+  font-size: 1.25rem;
+  box-shadow: 0 0 28px rgba(59,130,246,0.28);
+}
+.logo-text {
+  font-size: 1.45rem; font-weight: 800; letter-spacing: -0.02em;
+  background: linear-gradient(90deg, var(--blue), var(--teal));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.tagline { font-size: 0.85rem; color: var(--muted); }
+
+/* ===== CARD ===== */
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.025);
+}
+
+/* ===== TABS ===== */
+.tabs { display: flex; border-bottom: 1px solid var(--border); }
+.tab {
+  flex: 1; padding: 15px 8px;
+  background: none; border: none;
+  color: var(--muted); font-family: 'Outfit', sans-serif;
+  font-size: 0.875rem; font-weight: 500; cursor: pointer;
+  position: relative; transition: color 0.2s;
+}
+.tab::after {
+  content: ''; position: absolute; bottom: 0; left: 15%; right: 15%;
+  height: 2px; background: linear-gradient(90deg, var(--blue), var(--teal));
+  border-radius: 2px; transform: scaleX(0); transition: transform 0.2s;
+}
+.tab.active { color: var(--text); font-weight: 600; }
+.tab.active::after { transform: scaleX(1); }
+
+/* ===== BODY ===== */
+.form-body { padding: 26px 26px 22px; }
+.field { margin-bottom: 13px; }
+.field label {
+  display: block; font-size: 0.72rem; font-weight: 700; color: var(--muted);
+  margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em;
+}
+.inp {
+  width: 100%; padding: 11px 14px;
+  background: var(--card2); border: 1px solid var(--border2);
+  border-radius: 9px; color: var(--text);
+  font-family: 'Outfit', sans-serif; font-size: 0.93rem; outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.inp:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+.inp::placeholder { color: var(--muted2); }
+
+/* ===== BTN ===== */
+.btn-main {
+  width: 100%; padding: 13px;
+  background: linear-gradient(135deg, var(--blue), var(--blue2));
+  border: none; border-radius: 9px; color: #fff;
+  font-family: 'Outfit', sans-serif; font-size: 0.97rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; margin-top: 4px;
+}
+.btn-main:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(59,130,246,0.32); opacity: 0.95; }
+.btn-main:active { transform: translateY(0); }
+.btn-main:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ===== OTP ===== */
+.otp-grid { display: flex; gap: 7px; justify-content: center; margin: 14px 0 18px; }
+.otp-cell {
+  width: 48px; height: 56px;
+  background: var(--card2); border: 2px solid var(--border2); border-radius: 9px;
+  text-align: center; font-family: 'JetBrains Mono', monospace;
+  font-size: 1.35rem; font-weight: 700; color: var(--text); outline: none;
+  transition: border-color 0.15s;
+}
+.otp-cell:focus { border-color: var(--blue); }
+.otp-cell.filled { border-color: var(--teal); color: var(--teal); }
+
+/* ===== ALERT ===== */
+.alert {
+  display: none; padding: 9px 13px; border-radius: 8px;
+  font-size: 0.83rem; font-weight: 500; margin-bottom: 13px;
+}
+.alert.err { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--red); }
+.alert.ok  { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: var(--green); }
+
+/* ===== EMAIL BADGE ===== */
+.email-badge {
+  text-align: center; padding: 16px;
+  background: rgba(59,130,246,0.05); border: 1px dashed rgba(59,130,246,0.2);
+  border-radius: 11px; margin-bottom: 14px;
+}
+.email-badge .em { font-size: 1.8rem; margin-bottom: 5px; }
+.email-badge p { font-size: 0.8rem; color: var(--muted); }
+.email-badge strong { color: var(--blue); font-size: 0.88rem; }
+
+/* ===== LINK ===== */
+.link-btn {
+  background: none; border: none; color: var(--blue);
+  font-family: 'Outfit', sans-serif; font-size: 0.84rem;
+  cursor: pointer; text-decoration: underline; padding: 0;
+}
+.text-c { text-align: center; }
+.mt-s { margin-top: 10px; }
+.muted-sm { color: var(--muted); font-size: 0.8rem; }
+
+/* ===== TEACHER KEY BTN ===== */
+.t-key-btn {
+  position: fixed; bottom: 22px; right: 22px;
+  width: 42px; height: 42px;
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 11px; display: grid; place-items: center;
+  cursor: pointer; font-size: 1rem; z-index: 100;
+  color: var(--muted2); transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.t-key-btn:hover {
+  border-color: var(--amber); color: var(--amber);
+  box-shadow: 0 0 18px rgba(245,158,11,0.18);
+  transform: scale(1.07);
+}
+
+/* ===== TEACHER MODAL ===== */
+.t-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.72); backdrop-filter: blur(6px);
+  z-index: 200; display: none; place-items: center; padding: 20px;
+}
+.t-overlay.open { display: grid; }
+.t-modal {
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 18px; width: 100%; max-width: 360px; overflow: hidden;
+  animation: pop 0.22s ease both;
+}
+@keyframes pop { from { opacity:0; transform:scale(0.94) translateY(8px); } to { opacity:1; transform:scale(1); } }
+.t-head {
+  padding: 18px 22px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.t-head h3 { font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+.t-body { padding: 18px 22px 22px; }
+.x-btn { background: none; border: none; color: var(--muted); font-size: 1.15rem; cursor: pointer; transition: color 0.15s; }
+.x-btn:hover { color: var(--text); }
+
+/* Teacher tabs */
+.t-tabs {
+  display: flex; background: var(--card2); border-radius: 9px;
+  padding: 3px; margin-bottom: 16px; border: 1px solid var(--border);
+}
+.t-tab {
+  flex: 1; padding: 7px; background: none; border: none;
+  color: var(--muted); font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem; font-weight: 500; border-radius: 7px; cursor: pointer; transition: all 0.15s;
+}
+.t-tab.active { background: var(--card); color: var(--text); font-weight: 700; }
+
+.hint-box {
+  font-size: 0.73rem; color: var(--muted); text-align: center;
+  margin-top: 10px; padding: 8px;
+  background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.12);
+  border-radius: 7px;
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="site-header">
+    <div class="logo-row">
+      <div class="logo-gem">🎓</div>
+      <span class="logo-text">AI Ustoz</span>
+    </div>
+    <p class="tagline">O'quvchilar uchun baholash platformasi</p>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" id="tab-login"   onclick="switchTab('login')">Kirish</button>
+      <button class="tab"        id="tab-reg"      onclick="switchTab('register')">Ro'yxatdan o'tish</button>
+      <button class="tab"        id="tab-forgot"   onclick="switchTab('forgot')">Parol tiklash</button>
+    </div>
+
+    <div class="form-body">
+
+      <!-- LOGIN -->
+      <div id="f-login">
+        <div class="alert" id="al-login"></div>
+        <div class="field"><label>Email</label>
+          <input id="l-email" class="inp" type="email" placeholder="siz@email.com" autocomplete="email"></div>
+        <div class="field"><label>Parol</label>
+          <input id="l-pass" class="inp" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+        <button class="btn-main" onclick="doLogin()">Kirish →</button>
+        <div class="text-c mt-s">
+          <button class="link-btn" onclick="switchTab('forgot')">Parolni unutdingizmi?</button>
+        </div>
+      </div>
+
+      <!-- REGISTER STEP 1 -->
+      <div id="f-reg1" style="display:none">
+        <div class="alert" id="al-reg"></div>
+        <div class="field"><label>To'liq ismingiz</label>
+          <input id="r-name" class="inp" placeholder="Ism Familiya" autocomplete="name"></div>
+        <div class="field"><label>Email</label>
+          <input id="r-email" class="inp" type="email" placeholder="siz@email.com" autocomplete="email"></div>
+        <div class="field"><label>Parol</label>
+          <input id="r-pass" class="inp" type="password" placeholder="Kamida 6 belgi" autocomplete="new-password"></div>
+        <button class="btn-main" onclick="doRegister()">Davom etish →</button>
+      </div>
+
+      <!-- REGISTER STEP 2 -->
+      <div id="f-reg2" style="display:none">
+        <div class="email-badge">
+          <div class="em">📧</div>
+          <p>Tasdiqlash kodi yuborildi:</p>
+          <strong id="reg-email-show">—</strong>
+        </div>
+        <div class="alert" id="al-otp"></div>
+        <div class="otp-grid" id="otp-reg">
+          <input class="otp-cell" maxlength="1" inputmode="numeric" oninput="otpMove(this,0,'otp-reg')" onkeydown="otpBack(event,this,0,'otp-reg')">
+          <input class="otp-cell" maxlength="1" inputmode="numeric" oninput="otpMove(this,1,'otp-reg')" onkeydown="otpBack(event,this,1,'otp-reg')">
+          <input class="otp-cell" maxlength="1" inputmode="numeric" oninput="otpMove(this,2,'otp-reg')" onkeydown="otpBack(event,this,2,'otp-reg')">
+          <input class="otp-cell" maxlength="1" inputmode="numeric" oninput="otpMove(this,3,'otp-reg')" onkeydown="otpBack(event,this,3,'otp-reg')">
+          <input class="otp-cell" maxlength="1" inputmode="numeric" oninput="otpMove(this,4,'otp-reg')" onkeydown="otpBack(event,this,4,'otp-reg')">
+          <input class="otp-cell" maxlength="1" inputmode="numeric" oninput="otpMove(this,5,'otp-reg')" onkeydown="otpBack(event,this,5,'otp-reg')">
+        </div>
+        <button class="btn-main" onclick="doVerify()">Tasdiqlash ✓</button>
+        <div class="text-c mt-s">
+          <button class="link-btn" onclick="backToReg()">← Orqaga</button>
+        </div>
+      </div>
+
+      <!-- FORGOT STEP 1 -->
+      <div id="f-frg1" style="display:none">
+        <div class="alert" id="al-frg"></div>
+        <div class="field"><label>Email manzilingiz</label>
+          <input id="f-email" class="inp" type="email" placeholder="siz@email.com"></div>
+        <button class="btn-main" onclick="doForgot()">Reset kodi yuborish →</button>
+        <div class="text-c mt-s">
+          <button class="link-btn" onclick="switchTab('login')">← Kirishga qaytish</button>
+        </div>
+      </div>
+
+      <!-- FORGOT STEP 2 -->
+      <div id="f-frg2" style="display:none">
+        <div class="email-badge">
+          <div class="em">🔐</div>
+          <p>Reset kodi yuborildi</p>
+          <strong id="frg-email-show">—</strong>
+        </div>
+        <div class="alert" id="al-frg2"></div>
+        <div class="otp-grid" id="otp-frg">
+          <input class="otp-cell" maxlength="1" inputmode="numeric" oninput="otpMove(this,0,'otp-frg')" onkeydown="otpBack(event,this,0,'otp-frg')">
+          <input class="otp-cell" maxlength="1" inputmode="numeric" oninput="otpMove(this,1,'otp-frg')" onkeydown="otpBack(event,this,1,'otp-frg')">
+          <input class="otp-cell" maxlength="1" inputmode="numeric" oninput="otpMove(this,2,'otp-frg')" onkeydown="otpBack(event,this,2,'otp-frg')">
+          <input class="otp-cell" maxlength="1" inputmode="numeric" oninput="otpMove(this,3,'otp-frg')" onkeydown="otpBack(event,this,3,'otp-frg')">
+          <input class="otp-cell" maxlength="1" inputmode="numeric" oninput="otpMove(this,4,'otp-frg')" onkeydown="otpBack(event,this,4,'otp-frg')">
+          <input class="otp-cell" maxlength="1" inputmode="numeric" oninput="otpMove(this,5,'otp-frg')" onkeydown="otpBack(event,this,5,'otp-frg')">
+        </div>
+        <div class="field"><label>Yangi parol</label>
+          <input id="f-newpass" class="inp" type="password" placeholder="Yangi parol (min 6)"></div>
+        <button class="btn-main" onclick="doReset()">Parolni saqlash ✓</button>
+      </div>
+
+    </div><!-- /form-body -->
+  </div><!-- /card -->
+
+  <p class="text-c muted-sm" style="margin-top:18px;">© 2025 AI Ustoz Enterprise</p>
+</div>
+
+<!-- TEACHER HIDDEN BUTTON -->
+<button class="t-key-btn" onclick="openT()" title="O'qituvchi kirishi">🔑</button>
+
+<!-- TEACHER MODAL -->
+<div class="t-overlay" id="t-overlay">
+  <div class="t-modal">
+    <div class="t-head">
+      <h3>🔑 O'qituvchi Kirishi</h3>
+      <button class="x-btn" onclick="closeT()">✕</button>
+    </div>
+    <div class="t-body">
+      <div class="t-tabs">
+        <button class="t-tab active" id="tt-l" onclick="switchT('l')">Kirish</button>
+        <button class="t-tab" id="tt-r" onclick="switchT('r')">Hisob yaratish</button>
+      </div>
+
+      <!-- Teacher Login -->
+      <div id="tf-l">
+        <div class="alert" id="al-tl"></div>
+        <div class="field"><label>Email</label>
+          <input id="tl-email" class="inp" type="email" placeholder="teacher@email.com"></div>
+        <div class="field"><label>Parol</label>
+          <input id="tl-pass" class="inp" type="password" placeholder="Parolingiz"></div>
+        <div class="field"><label>Maxsus kalit</label>
+          <input id="tl-secret" class="inp" type="password" placeholder="••••••" autocomplete="off"></div>
+        <button class="btn-main" onclick="doTeacherLogin()">Kirish →</button>
+        <p class="hint-box">🔒 Maxsus kalit admin tomonidan beriladi</p>
+      </div>
+
+      <!-- Teacher Register -->
+      <div id="tf-r" style="display:none">
+        <div class="alert" id="al-tr"></div>
+        <div class="field"><label>Email</label>
+          <input id="tr-email" class="inp" type="email" placeholder="teacher@email.com"></div>
+        <div class="field"><label>Parol</label>
+          <input id="tr-pass" class="inp" type="password" placeholder="Yangi parol"></div>
+        <div class="field"><label>Maxsus kalit</label>
+          <input id="tr-secret" class="inp" type="password" placeholder="••••••" autocomplete="off"></div>
+        <button class="btn-main" onclick="doTeacherRegister()">Hisob yaratish →</button>
+        <p class="hint-box">🔒 Birinchi marta hisob yaratish uchun</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Config from config.js (API_BASE variable)
+const EJS_SERVICE  = 'service_pa8gy9p';
+const EJS_TEMPLATE = 'template_oqf4m5n';
+const EJS_KEY      = 'WBQT54zVVgzcv_3Nj';
+emailjs.init(EJS_KEY);
+
+let pendingEmail = '';
+
+// ===== AUTO REDIRECT =====
+if (localStorage.getItem('token')) {
+  location.href = localStorage.getItem('role') === 'teacher' ? '/dashboard' : '/student';
+}
+
+// ===== TABS =====
+function switchTab(name) {
+  const ids = ['f-login','f-reg1','f-reg2','f-frg1','f-frg2'];
+  ids.forEach(id => { const e = document.getElementById(id); if(e) e.style.display = 'none'; });
+  ['login','reg','forgot'].forEach(t => document.getElementById('tab-'+t)?.classList.remove('active'));
+
+  if (name==='login')    { show('f-login');  document.getElementById('tab-login').classList.add('active'); }
+  if (name==='register') { show('f-reg1');   document.getElementById('tab-reg').classList.add('active'); }
+  if (name==='forgot')   { show('f-frg1');   document.getElementById('tab-forgot').classList.add('active'); }
+}
+
+function show(id, v=true) { const e=document.getElementById(id); if(e) e.style.display = v?'block':'none'; }
+function hide(id) { show(id, false); }
+
+function al(id, msg, type) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.textContent = msg; e.className = 'alert ' + type; e.style.display = 'block';
+}
+
+// ===== OTP =====
+function otpMove(el, idx, grid) {
+  el.classList.toggle('filled', !!el.value);
+  if (el.value) {
+    const cells = document.querySelectorAll(`#${grid} .otp-cell`);
+    if (idx < 5) cells[idx+1].focus();
+  }
+}
+function otpBack(e, el, idx, grid) {
+  if (e.key==='Backspace' && !el.value && idx>0)
+    document.querySelectorAll(`#${grid} .otp-cell`)[idx-1].focus();
+}
+function getOtp(grid) {
+  return [...document.querySelectorAll(`#${grid} .otp-cell`)].map(c=>c.value).join('');
+}
+function clearOtp(grid) {
+  document.querySelectorAll(`#${grid} .otp-cell`).forEach(c=>{ c.value=''; c.classList.remove('filled'); });
+}
+
+// ===== EMAILJS =====
+async function sendCode(email, name, code, purpose) {
+  try {
+    await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, {
+      to_email: email, to_name: name||email, code, purpose,
+      subject: `AI Ustoz — ${purpose} kodi: ${code}`
+    });
+  } catch(err) { console.warn('📧 Kod:', code, err); }
+}
+
+// ===== LOGIN =====
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const password = document.getElementById('l-pass').value;
+  if (!email||!password) return al('al-login','❌ Email va parolni kiriting','err');
+  const btn = event.currentTarget;
+  btn.disabled=true; btn.textContent='Yuklanmoqda...';
+  try {
+    const r = await fetch(API_BASE + '/api/auth/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password})
+    });
+    const d = await r.json();
+    if (r.ok) { saveUser(d); location.href='/student'; }
+    else al('al-login','❌ '+(d.detail||'Xato!'),'err');
+  } catch { al('al-login','❌ Server bilan bog\'lanib bo\'lmadi','err'); }
+  btn.disabled=false; btn.textContent='Kirish →';
+}
+
+// ===== REGISTER =====
+async function doRegister() {
+  const full_name = document.getElementById('r-name').value.trim();
+  const email     = document.getElementById('r-email').value.trim();
+  const password  = document.getElementById('r-pass').value;
+  if (!full_name||!email||!password) return al('al-reg','❌ Barcha maydonlarni to\'ldiring','err');
+  if (password.length<6) return al('al-reg','❌ Parol kamida 6 belgi','err');
+  const btn = event.currentTarget;
+  btn.disabled=true; btn.textContent='Yuborilmoqda...';
+  try {
+    const r = await fetch(API_BASE + '/api/auth/register', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({full_name, email, password})
+    });
+    const d = await r.json();
+    if (r.ok) {
+      pendingEmail = d.email;
+      await sendCode(email, full_name, d.verify_code, 'ro\'yxat tasdiqlash');
+      document.getElementById('reg-email-show').textContent = email;
+      hide('f-reg1'); show('f-reg2');
+      clearOtp('otp-reg');
+      document.querySelector('#otp-reg .otp-cell')?.focus();
+    } else al('al-reg','❌ '+(d.detail||'Xato!'),'err');
+  } catch { al('al-reg','❌ Server xatosi','err'); }
+  btn.disabled=false; btn.textContent='Davom etish →';
+}
+
+function backToReg() { hide('f-reg2'); show('f-reg1'); }
+
+async function doVerify() {
+  const code = getOtp('otp-reg');
+  if (code.length!==6) return al('al-otp','❌ 6 ta raqam kiriting','err');
+  const btn = event.currentTarget;
+  btn.disabled=true; btn.textContent='Tekshirilmoqda...';
+  try {
+    const r = await fetch(API_BASE + '/api/auth/verify-email', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email: pendingEmail, code})
+    });
+    const d = await r.json();
+    if (r.ok) {
+      saveUser(d);
+      al('al-otp','✅ Muvaffaqiyatli! Yo\'naltirilmoqda...','ok');
+      setTimeout(()=>location.href='/student', 1100);
+    } else { al('al-otp','❌ '+(d.detail||'Kod noto\'g\'ri'),'err'); btn.disabled=false; btn.textContent='Tasdiqlash ✓'; }
+  } catch { btn.disabled=false; btn.textContent='Tasdiqlash ✓'; }
+}
+
+// ===== FORGOT =====
+async function doForgot() {
+  const email = document.getElementById('f-email').value.trim();
+  if (!email) return al('al-frg','❌ Email kiriting','err');
+  const btn = event.currentTarget;
+  btn.disabled=true; btn.textContent='Yuborilmoqda...';
+  try {
+    const r = await fetch(API_BASE + '/api/auth/forgot-password', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email})
+    });
+    const d = await r.json();
+    if (r.ok) {
+      pendingEmail = d.email;
+      await sendCode(email,'',d.reset_code,'parol tiklash');
+      document.getElementById('frg-email-show').textContent = email;
+      hide('f-frg1'); show('f-frg2'); clearOtp('otp-frg');
+    } else al('al-frg','❌ '+(d.detail||'Email topilmadi'),'err');
+  } catch { al('al-frg','❌ Server xatosi','err'); }
+  btn.disabled=false; btn.textContent='Reset kodi yuborish →';
+}
+
+async function doReset() {
+  const code = getOtp('otp-frg');
+  const np   = document.getElementById('f-newpass').value;
+  if (code.length!==6) return al('al-frg2','❌ Kodni kiriting','err');
+  if (!np||np.length<6) return al('al-frg2','❌ Parol kamida 6 belgi','err');
+  const btn = event.currentTarget;
+  btn.disabled=true; btn.textContent='Saqlanmoqda...';
+  try {
+    const r = await fetch(API_BASE + '/api/auth/reset-password', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email: pendingEmail, code, new_password: np})
+    });
+    const d = await r.json();
+    if (r.ok) {
+      al('al-frg2','✅ Parol o\'zgartirildi!','ok');
+      setTimeout(()=>switchTab('login'),1800);
+    } else al('al-frg2','❌ '+(d.detail||'Noto\'g\'ri kod'),'err');
+  } catch {}
+  btn.disabled=false; btn.textContent='Parolni saqlash ✓';
+}
+
+// ===== TEACHER MODAL =====
+function openT()  { document.getElementById('t-overlay').classList.add('open'); }
+function closeT() { document.getElementById('t-overlay').classList.remove('open'); }
+document.getElementById('t-overlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeT(); });
+
+function switchT(tab) {
+  ['l','r'].forEach(t => {
+    document.getElementById('tf-'+t).style.display='none';
+    document.getElementById('tt-'+t).classList.remove('active');
+  });
+  document.getElementById('tf-'+tab).style.display='block';
+  document.getElementById('tt-'+tab).classList.add('active');
+}
+
+async function doTeacherLogin() {
+  const email  = document.getElementById('tl-email').value.trim();
+  const password = document.getElementById('tl-pass').value;
+  const secret = document.getElementById('tl-secret').value;
+  if (!email||!password||!secret) return al('al-tl','❌ Barcha maydonlarni to\'ldiring','err');
+  const btn = event.currentTarget;
+  btn.disabled=true; btn.textContent='Tekshirilmoqda...';
+  try {
+    const r = await fetch(API_BASE + '/api/auth/teacher-login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password, secret})
+    });
+    const d = await r.json();
+    if (r.ok) { saveUser(d); location.href='/dashboard'; }
+    else al('al-tl','❌ '+(d.detail||'Xato!'),'err');
+  } catch { al('al-tl','❌ Server xatosi','err'); }
+  btn.disabled=false; btn.textContent='Kirish →';
+}
+
+async function doTeacherRegister() {
+  const email  = document.getElementById('tr-email').value.trim();
+  const password = document.getElementById('tr-pass').value;
+  const secret = document.getElementById('tr-secret').value;
+  if (!email||!password||!secret) return al('al-tr','❌ Barcha maydonlarni to\'ldiring','err');
+  if (password.length<6) return al('al-tr','❌ Parol kamida 6 belgi','err');
+  const btn = event.currentTarget;
+  btn.disabled=true; btn.textContent='Yaratilmoqda...';
+  try {
+    const r = await fetch(API_BASE + '/api/auth/teacher-register', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password, secret})
+    });
+    const d = await r.json();
+    if (r.ok) { saveUser(d); location.href='/dashboard'; }
+    else al('al-tr','❌ '+(d.detail||'Xato!'),'err');
+  } catch { al('al-tr','❌ Server xatosi','err'); }
+  btn.disabled=false; btn.textContent='Hisob yaratish →';
+}
+
+function saveUser(d) {
+  localStorage.setItem('token', d.access_token);
+  localStorage.setItem('role', d.role);
+  localStorage.setItem('full_name', d.full_name);
+  localStorage.setItem('user_id', d.user_id);
+}
+
+// Enter key
+document.addEventListener('keydown', e => {
+  if (e.key!=='Enter') return;
+  if (document.getElementById('t-overlay').classList.contains('open')) {
+    document.getElementById('tt-l').classList.contains('active') ? doTeacherLogin() : doTeacherRegister();
+  } else if (document.getElementById('f-login').style.display!=='none') {
+    doLogin();
+  }
+});
+</script>
+</body>
+</html>
